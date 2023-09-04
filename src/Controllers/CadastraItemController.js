@@ -1,7 +1,6 @@
 var database = require('../../database');
 
 function cadastraItemOrcamento(request) {
-    console.log("🚀 ~ file: CadastraItemController.js:4 ~ cadastraItemOrcamento ~ request:", request.payload);
     try {
         var { categoria, produto, descricao, valor } = request.payload;
         var item = {
@@ -11,7 +10,6 @@ function cadastraItemOrcamento(request) {
             valor: valor,
             detalhes: descricao
         }
-        console.log("🚀 ~ file: CadastraItemController.js:4 ~ item ~ request:", item);
         database.tabela_itens.push(item);
 
         return {
@@ -32,40 +30,63 @@ function cadastraItemOrcamento(request) {
 
 
 function listaCategorias(request) {
-    const categorias = database.categorias;
-    var data = {
-        code: 200,
-        message: "Lista de categorias",
-        data: categorias
+    try {
+        const categorias = database.categorias;
+        var data = {
+            code: 200,
+            message: "Lista de categorias",
+            data: categorias
+        }
+        return data;
+    } catch (error) {
+        console.error("Erro ao listar categorias:", error);
+        var data = {
+            code: 500,
+            message: "Erro ao listar categorias",
+            error: error
+        }
+        return data;
     }
-    return data;
 }
+
 
 function calcularItens(request) {
+    try {
+        var precosArray = {};
+        var quantidadeArray = {};
+        const categoriasJson = JSON.parse(request.payload.categorias);
+        const quantidadeJson = JSON.parse(request.payload.quantidade);
+        Object.entries(categoriasJson).forEach(([chave, valores]) => {
+            const soma = valores.reduce((total, valor) => {
+                const valorNumerico = parseFloat(valor.replace('R$', '').replace('.', '').replace(',00', '').replace(/,/g, ''));
+                return total + valorNumerico;
+            }, 0);
+            precosArray[chave] = soma;
+        });
+        Object.entries(quantidadeJson).forEach(([chave, valor]) => {
+            quantidadeArray[chave] = valor;
+        });
 
-    var precosArray = {};
-    var quantidadeArray = {};
-    const categoriasJson = JSON.parse(request.payload.categorias);
-    const quantidadeJson = JSON.parse(request.payload.quantidade);
-    Object.entries(categoriasJson).forEach(([chave, valores]) => {
-        const soma = valores.reduce((total, valor) => {
-            const valorNumerico = parseFloat(valor.replace('R$', '').replace('.', '').replace(',00', '').replace(/,/g, ''));
-            return total + valorNumerico;
-        }, 0);
-        precosArray[chave] = soma;
-    });
-    Object.entries(quantidadeJson).forEach(([chave, valor]) => {
-        quantidadeArray[chave] = valor;
-    });
-
-    var data = {
-        code: 200,
-        message: "Lista de categorias e valores totais",
-        data: {'precosArray':precosArray,
-            'quantidadeArray':quantidadeArray}
+        var data = {
+            code: 200,
+            message: "Lista de categorias e valores totais",
+            data: {
+                'precosArray': precosArray,
+                'quantidadeArray': quantidadeArray
+            }
+        }
+        return data;
+    } catch (error) {
+        console.error("Erro ao calcular itens:", error);
+        var data = {
+            code: 500,
+            message: "Erro ao calcular itens",
+            error: error
+        }
+        return data;
     }
-    return data;
 }
+
 
 
 module.exports.listaCategorias = listaCategorias;

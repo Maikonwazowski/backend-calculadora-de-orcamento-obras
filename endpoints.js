@@ -13,7 +13,7 @@ module.exports = [
           auth: false,
           description: 'Listar categorias do orçamento',
           notes: 'Listar',
-          tags: ['api', 'Listar'],
+          tags: ['categorias', 'Listar'],
           cors: {
             origin: ['*'],
             additionalHeaders: ['cache-control', 'x-requested-with'],
@@ -30,9 +30,9 @@ module.exports = [
           }, 
           config: {
             auth: false,
-            description: 'Login',
-            notes: 'Login',
-            tags: ['api', 'login'],
+            description: 'Cadastrar item na base',
+            notes: 'Cadastrar',
+            tags: ['post', 'cadastrar', 'item'],
             cors: {
                 origin: ['*'],
                 additionalHeaders: ['cache-control', 'x-requested-with']
@@ -44,16 +44,14 @@ module.exports = [
         method: 'POST',
         path: '/calculadora/calcular_itens',
         handler: async (request, h) => {
-          console.log("🚀 ~ file: endpoints.js:47 ~ handler: ~ request:", request.payload)
           const resposta = await cadastraItem.calcularItens(request);
-          console.log("🚀 ~ file: endpoints.js:49 ~ handler: ~ resposta:", resposta)
           return h.response(resposta).code(200);
         },
         config: {
           auth: false,
           description: 'Calcula o valor total por categoria',
           notes: 'Calcular',
-          tags: ['api', 'Listar'],
+          tags: ['Calcular', 'categoria', 'valor'],
           cors: {
             origin: ['*'],
             additionalHeaders: ['cache-control', 'x-requested-with'],
